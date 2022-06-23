@@ -1,0 +1,47 @@
+
+{% extends "layout.html" %}
+{% block body %} 
+<title>View Assignment</title>
+<html>
+<head></head>
+<body>
+
+<br>
+<br>
+<table border="2">
+    <tr>
+        <th>Assignment Title</th>
+        <th>Description</th>
+        <th>Submission_due_Date</th>
+        <th>state_of_assignment</th>
+    </tr>
+
+{% for item in user %}
+
+    <tr>
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[3]}}</td>
+        <td>{{item[4]}}</td>
+   </tr>
+
+    {% endfor %}
+    
+</table>
+
+{{ myhtml|e }}
+</body>
+</html>
+{% endblock %}
+
+
+  
+
+
+    
+      
+
+
+
+
+

@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %} 
+<html lang="en">
+	<head>
+		<h1>Welcome! Online assignment tracker system  </h1>
+		<title>Post Assignment</title>
+		
+	</head>
+		<div class="one">
+			<div class="two">
+				<ul>
+					<a><button type="index" value="upload"><a href="/index">Home</button></a>
+					<br><br>
+					<a><button type="display" value="display"><a href="/display">Display</button></a>
+					<br><br>
+					<a><button type="update" value="update"><a href="/update">Update</button></a>	
+					<br><br>
+					<a><button type="delete" value="delete"><a href="/delete">Delete</button></a>
+					<br>
+					
+				</ul>
+			</div>						
+				</div>
+				<div class="contentbar">
+				<b>Post Assignment</b></br>
+				<br>
+			<form action="{{ url_for('post_assignment') }}" method="post" autocomplete="off">
+					<div class="mesage">{{ mesage }}</div>
+					<input type="text" name="assignment_title" placeholder="Assignment_title" class="textbox" id="assignment_title" required><br><br>
+					<input type="description" name="description" placeholder="Description of assignment" class="textbox" id="description" required><br><br>
+					<input type="date" name="submission_due_date" placeholder="Enter submission due date" class="textbox" id="submission_due_date" required><br><br>					
+					<input type="submit" value="Post Assignment">
+			</form>					
+				</div>
+				
+			</div>
+		</div>
+	</body>
+</html>
+
+{% endblock %}  

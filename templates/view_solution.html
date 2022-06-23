@@ -1,0 +1,101 @@
+<!-- 
+<title>View Assignment</title>
+<html>
+<head></head>
+<body>
+
+
+<table border="2">
+    <tr>
+        <th>Submission id</th>
+        <th>Assignment id</th>
+        <th>User id</th>
+        <th>Submission Date</th>
+        <a href="solution">Solution</a>
+    </tr>
+
+{% for item in record %}
+
+    <tr>
+        <td>{{item[0]}}</td>
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[3]}}</td>
+        <td>{{item[4]}}</td>
+   </tr>
+
+    {% endfor %}
+    
+</table>
+
+{{ myhtml|e }}
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+{% extends "layout.html" %}
+{% block body %} 
+
+<html lang="en">
+    <head>
+        <title>display</title>
+    </head>
+        <div class="one">
+            <div class="two">
+                <br>
+                
+                <ul>
+                    <a><button type="index" value="upload"><a href="/index">Home</button></a>
+                    <br><br>
+                    <a><button type="display" value="display"><a href="/display">Display</button></a>
+                    <br><br>
+                    <a><button type="update" value="update"><a href="/update">Update</button></a>
+                    <br><br>
+                    <a><button type="delete" value="delete"><a href="/delete">Delete</button></a>   
+                    <br><br>
+                </ul>
+            </div>                  
+                </div> 
+                    <h1>View solution of assignment</h1>
+                    {% block content %}
+                        <div class="border">
+                            <table class="worddark"></br></br>
+                                <tr>
+                                    <td>Submission_id:</td>
+                                    <td>{{ user['submission_id'] }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Assignment_id:</td>
+                                    <td>{{ user['assignment_id'] }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>User_id:</td>
+                                    <td>{{ user['user_id'] }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Submission_date:</td>
+                                    <td>{{ user['submission_date'] }}</td>
+                                </tr>   	
+                                <tr>
+                                    <td><a href="solution">Click_here_to_view_solution:</td>
+                                    
+                                </tr>   
+
+                            </table>
+                        </div>
+                    {% endblock %}                                      
+                </div>
+                
+            </div>
+        </div>
+    </body>
+</html>
+{% endblock %}

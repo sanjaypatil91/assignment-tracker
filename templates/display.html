@@ -1,0 +1,52 @@
+
+{% extends "layout.html" %}
+{% block body %} 
+
+<html lang="en">
+	<head>
+		<title>display</title>
+	</head>
+		<div class="one">
+			<div class="two">
+				<br>
+				
+				<ul>
+					<a><button type="index" value="upload"><a href="/index">Home</button></a>
+					<br><br>
+					<a><button type="display" value="display"><a href="/display">Display</button></a>
+					<br><br>
+					<a><button type="update" value="update"><a href="/update">Update</button></a>
+					<br><br>
+					<a><button type="delete" value="delete"><a href="/delete">Delete</button></a>	
+					<br><br>
+				</ul>
+			</div>					
+				</div> 
+					<h1>Your profile details</h1>
+					{% block content %}
+						<div class="border">
+							<table class="worddark"></br></br>
+								<tr>
+									<td>Name:</td>
+									<td>{{ user['name'] }}</td>
+								</tr>
+
+								<tr>
+									<td>Email:</td>
+									<td>{{ user['email'] }}</td>
+								</tr>
+
+								<tr>
+									<td>Password:</td>
+									<td>{{ user['password'] }}</td>
+								</tr>						
+							</table>
+						</div>
+					{% endblock %}										
+				</div>
+				
+			</div>
+		</div>
+	</body>
+</html>
+{% endblock %}  
