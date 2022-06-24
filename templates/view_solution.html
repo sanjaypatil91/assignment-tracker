@@ -1,0 +1,44 @@
+
+{% extends "layout.html" %}
+{% block body %} 
+<title>View Solution</title>
+<html>
+<head></head>
+<body>
+
+<br><br>
+<table border="2">
+    <tr>
+        <th>Submission id</th>
+        <th>Assignment id</th>
+        <th>User id</th>
+        <th>Date</th>    
+        <th>Solution</th>
+        
+        <th>click to approve</th>
+        <th>click to reject</th>
+    </tr>
+
+{% for item in user %}
+
+    <tr>
+        <td>{{item['submission_id']}}</td>
+        <td>{{item['assignment_id']}}</td>
+        <td>{{item['user_id']}}</td>
+        <td>{{item['submission_date']}}</td> 
+        <a href="{{url_for('download',filename='') }}">View assignment</a>
+        <a href="/download/{{item['solution']}}">Click to view solution</a>
+        <td><button type="button">Approved</button></td>
+        <td><button type="button">Rejected</button></td>
+   </tr>
+
+    {% endfor %}
+    
+</table>
+</body>
+</html>
+
+{% endblock %}
+
+
+
