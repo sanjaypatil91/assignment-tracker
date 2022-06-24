@@ -12,22 +12,24 @@
     <tr>
         <th>Assignment Title</th>
         <th>Description</th>
-        <th>Submission_due_Date</th>
-        <th>state_of_assignment</th>
+        <th>Submission due Date</th>
     </tr>
 
 {% for item in user %}
 
     <tr>
-        <td>{{item[1]}}</td>
-        <td>{{item[2]}}</td>
-        <td>{{item[3]}}</td>
-        <td>{{item[4]}}</td>
+        <td>{{item['assignment_title']}}</td>
+        <td>{{item['description']}}</td>
+        <td>{{item['submission_due_date']}}</td>  
    </tr>
 
     {% endfor %}
-    
-</table>
+    </table>
+<br>
+<br>
+<a href="/upload"><button>Click here to upload assignment!</button>
+
+<br>
 
 {{ myhtml|e }}
 </body>
