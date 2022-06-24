@@ -9,6 +9,8 @@ from datetime import datetime
   
 app = Flask(__name__)
 app.secret_key = 'some_random_key'
+app.config['UPLOAD_FOLDER']='UPLOAD_FOLDER'
+
   
 mysql = MySQL(app)
 app.config['UPLOAD_FOLDER']='uploader'  
@@ -194,35 +196,41 @@ def view_assignment():
     return redirect(url_for('login'))  
 
 
-@app.route('/view_submission',methods=['GET','POST'])
-def view_submission():
-    submission_id=str(random.randint(0,10000))
-    mesage=''
-    if request.method=='POST':
-        assignment_id = request.form['assignment_id']
-        user_id = request.form['user_id']
-        submission_date = request.form['submission_date']
-        solution= request.form['solution']
-        cursor=mysql.connection.cursor()
-        cursor.execute("select * from submission")
-        mysql.connection.commit()
-        mesage = 'You have successfully added new assignment!'
-        return redirect(url_for('teacher_dashboard'))
-    return render_template("view_submission.html",mesage=mesage)
+# @app.route('/view_solution',methods=['GET','POST'])
+# def view_solution():
+#     submission_id=str(random.randint(0,10000))
+#     mesage=''
+#     if request.method=='POST':
+#         assignment_id = request.form['assignment_id']
+#         user_id = request.form['user_id']
+#         submission_date = request.form['submission_date']
+#         solution= request.form['solution']
+#         cursor=mysql.connection.cursor()
+#         cursor.execute("select * from submission")
+#         mysql.connection.commit()
+#         mesage = 'You have successfully added new assignment!'
+#         return redirect(url_for('teacher_dashboard'))
+#     return render_template("view_solution.html",user=user)
 
-# @app.route("/view_submission")
-# def view_submission():
-#     if 'loggedin' in session:
-#         cursor = mysql.connection.cursor()
-#         cursor.execute('SELECT * FROM submission')
-#         user = cursor.fetchall()
-#         return render_template("view_submission.html", user=user)    
-#     return redirect(url_for('login')) 
+@app.route("/view_solution")
+def view_solution():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM submission')
+        user = cursor.fetchall()
+        return render_template("view_solution.html", user=user)    
+    return redirect(url_for('login')) 
 
 
-@app.route("/submission")
-def submission():
-    return render_template ('submission.html')
+@app.route('/download/<string:filename>',methods=['GET'])
+def download(filename):
+    print(filename)
+    uploads=UPLOAD_FOLDER
+    return send_file(uploads+'/'+filename, as_attachment=True)
+
+# @app.route("/solution")
+# def solution():
+#     return render_template ('solution.html')
 
 
 
@@ -244,15 +252,43 @@ def submission():
 
 
 @app.route('/upload')
-def upload_file():
+def upload():
    return render_template('upload.html')
     
-@app.route('/upload', methods = ['GET', 'POST'])
-def upload():
-   if request.method == 'POST':
-      f = request.files['file']
-      f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-      return 'file uploaded successfully' 
+       
+@app.route('/uploader',methods=['GET','POST'])
+def upload_file():
+    submission_id=str(random.randint(0,10000))
+    mesage=''
+    if request.method=='POST':
+        submission_date = datetime.now()
+        f = request.files['file']
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+        u1 =('select user_id from user where name = % s', (session['name'], ))
+        cursor.execute(u1)
+        user_id_user=cursor.fetchall()
+        user_id=user_id_user[0]
+        assignment_title=request.form['title']
+        assignment_id = request.form['assignment_title']
+        a1 =('select assignment_id from assignment where assignment_title = %s',('assignment_title'))
+        cursor.execute(a1)
+        assignment_id_rec=cursor.fetchone()
+        print(user_id_user)
+        print(assignment_id_rec)
+        query=cursor.execute("insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values(%s,%s,%s,%s,%s)",('submission_id','assignment_id_rec[0]','user_id[0]','submission_date','UPLOAD_FOLDER'))
+        cursor.execute(query)
+        mysql.connection.commit()
+        cursor.close()
+        mesage = 'You have successfully uploaded new assignment!'
+        return render_template('student_dashboard.html')
+
+
+# @app.route('/upload', methods = ['GET', 'POST'])
+# def upload():
+#    if request.method == 'POST':
+#       f = request.files['file']
+#       f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+#       return 'file uploaded successfully' 
 
 @app.route('/success', methods = ['POST'])  
 def success():  
