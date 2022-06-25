@@ -421,4 +421,4 @@ if __name__ == "__main__":
 #         cursor = mysql.connection.cursor()
 #         cursor.execute('SELECT * FROM assignment')
 #         result = cursor.fetchone()
-#         return render_template("view_assignment.html",records=result)
+
