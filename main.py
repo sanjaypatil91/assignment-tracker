@@ -156,7 +156,7 @@ def student_dashboard():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM user')
         result = cursor.fetchall()
-    return render_template("student_dashboard.html", records=result, name=name)
+    return render_template("student_dashboard.html", user=result, name=name)
 
     
 @app.route("/teacher_dashboard",methods=["GET","POST"])
@@ -166,7 +166,7 @@ def teacher_dashboard():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM user')
         result=cursor.fetchone()
-    return render_template("teacher_dashboard.html", records=result, name=name)
+    return render_template("teacher_dashboard.html", user=result, name=name)
       
 
 @app.route('/post_assignment',methods=['GET','POST'])
@@ -215,18 +215,18 @@ def view_assignment():
 @app.route("/view_solution")
 def view_solution():
     if 'loggedin' in session:
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM submission')
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('select * from submission')
         user = cursor.fetchall()
         return render_template("view_solution.html", user=user)    
-    return redirect(url_for('login')) 
+  
 
-
-@app.route('/download/<string:filename>',methods=['GET'])
+@app.route('/download/<string:filename>', methods=['GET'])
 def download(filename):
-    print(filename)
-    uploads=UPLOAD_FOLDER
-    return send_file(uploads+'/'+filename, as_attachment=True)
+   print(filename)
+   uploads=UPLOAD_FOLDER
+   return send_file(uploads+'/'+filename, as_attachment=True)
+
 
 # @app.route("/solution")
 # def solution():
@@ -264,18 +264,22 @@ def upload_file():
         submission_date = datetime.now()
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-        u1 =('select user_id from user where name = % s', (session['name'], ))
+
+        u1 =f"""select user_id from user where name ='{session['name']}';"""
         cursor.execute(u1)
         user_id_user=cursor.fetchall()
         user_id=user_id_user[0]
-        assignment_title=request.form['title']
-        assignment_id = request.form['assignment_title']
-        a1 =('select assignment_id from assignment where assignment_title = %s',('assignment_title'))
+
+        assignment_title=request.form['assignment_title']
+        
+        a1 =f"""select assignment_id from assignment where assignment_title={'assignment_title'};"""
         cursor.execute(a1)
+
         assignment_id_rec=cursor.fetchone()
         print(user_id_user)
         print(assignment_id_rec)
-        query=cursor.execute("insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values(%s,%s,%s,%s,%s)",('submission_id','assignment_id_rec[0]','user_id[0]','submission_date','UPLOAD_FOLDER'))
+        query=cursor.execute("insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values('{submission_id}','{assignment_id_rec[0]}','{user_id[0]}','{submission_date}','{UPLOAD_FOLDER}')")
+        print(query)
         cursor.execute(query)
         mysql.connection.commit()
         cursor.close()
