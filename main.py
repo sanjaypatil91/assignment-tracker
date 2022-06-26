@@ -1,8 +1,6 @@
 
-
-
-
 from flask import Flask, render_template, request, redirect, url_for, session, send_file,flash
+from werkzeug.utils import secure_filename
 from flask_mysqldb import MySQL
 import mysql.connector
 import MySQLdb.cursors
@@ -11,9 +9,11 @@ import os.path
 import random
 from datetime import datetime
   
+UPLOAD_FOLDER="C:/Users/DELL/Documents/assignment_submission/uploaded_files"  
+
 app = Flask(__name__)
 app.secret_key = 'some_random_key'
-app.config['UPLOAD_FOLDER']='UPLOAD_FOLDER'
+
 
   
 mysql = MySQL(app)
@@ -23,6 +23,8 @@ app.config["MYSQL_CURSORCLASS"]="DictCursor"
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'password_123'
 app.config['MYSQL_DB'] = 'admin'
+app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER  
+
 
 @app.route('/Home', methods=['POST','GET'])
 def Home():
@@ -77,11 +79,11 @@ def register():
         return redirect(url_for('login'))
     return render_template("register.html",mesage=mesage)
 
-@app.route("/index")
-def index():
-    if 'loggedin' in session: 
-        return render_template("index.html")
-    return redirect(url_for('login'))
+# @app.route("/index")
+# def index():
+#     if 'loggedin' in session: 
+#         return render_template("index.html")
+#     return redirect(url_for('login'))
 
 
 @app.route("/display")
@@ -270,9 +272,11 @@ def upload_file():
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
 
         u1 =f"""select user_id from user where name ='{session['name']}';"""
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(u1)
         user_id_user=cursor.fetchall()
         user_id=user_id_user[0]
+        print(user_id)
 
         assignment_title=request.form['assignment_title']
         
@@ -282,9 +286,10 @@ def upload_file():
         assignment_id_rec=cursor.fetchone()
         print(user_id_user)
         print(assignment_id_rec)
-        query=cursor.execute("insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values('{submission_id}','{assignment_id_rec[0]}','{user_id[0]}','{submission_date}','{UPLOAD_FOLDER}')")
+        query=f"""insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values('{submission_id}','{assignment_id_rec[0]}','{user_id[0]}','{submission_date}','{f.filename}');"""
         print(query)
-        cursor.execute(query)
+        q=cursor.execute(query)
+        print(q)
         mysql.connection.commit()
         cursor.close()
         mesage = 'You have successfully uploaded new assignment!'
@@ -305,9 +310,9 @@ def success():
         f.save(f.filename)  
         return render_template("success.html", name = f.filename)  
 
-@app.route('/result',methods = ['POST', 'GET'])
-def result():
-      return render_template("result.html")
+# @app.route('/result',methods = ['POST', 'GET'])
+# def result():
+#       return render_template("result.html")
 
 # @app.route('/static/<path:file_name>',)
 # def static(file_name):
