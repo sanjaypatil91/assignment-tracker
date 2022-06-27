@@ -13,8 +13,6 @@ UPLOAD_FOLDER="C:/Users/DELL/Documents/assignment_submission/uploaded_files"
 
 app = Flask(__name__)
 app.secret_key = 'some_random_key'
-
-
   
 mysql = MySQL(app)
 app.config['UPLOAD_FOLDER']='uploader'  
@@ -78,12 +76,6 @@ def register():
         mesage='Registration Successfully. Login Here...','success'
         return redirect(url_for('login'))
     return render_template("register.html",mesage=mesage)
-
-# @app.route("/index")
-# def index():
-#     if 'loggedin' in session: 
-#         return render_template("index.html")
-#     return redirect(url_for('login'))
 
 
 @app.route("/display")
@@ -234,6 +226,67 @@ def download(filename):
    return send_file(uploads+'/'+filename, as_attachment=True)
 
 
+
+@app.route('/upload')
+def upload():
+   return render_template('upload.html')
+    
+       
+@app.route('/uploader',methods=['GET','POST'])
+def upload_file():
+    submission_id=str(random.randint(0,10000))
+    mesage=''
+    if request.method=='POST':
+        submission_date = datetime.now()
+        f = request.files['file']
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+        
+
+        u1 =f"""select user_id from user where name ='{session['name']}';"""
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(u1)
+        user_id_user=cursor.fetchall()
+        user_id=user_id_user[0]
+        l1=user_id.get('user_id')
+        print(l1)
+
+        assignment_title=request.form['assignment_title']
+        
+        a1 =f"""select assignment_id from assignment where assignment_title={'assignment_title'};"""
+        cursor.execute(a1)
+
+        assignment_id_rec=cursor.fetchone()
+        l2=assignment_id_rec.get('assignment_id')
+        print(l2)
+        query=f"""insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values('{submission_id}','{l2}','{l1}','{submission_date}','{f.filename}');"""
+        print(query)
+        q=cursor.execute(query)
+        print(q)
+        mysql.connection.commit()
+        cursor.close()
+        mesage = 'You have successfully uploaded new assignment!'
+        return render_template('student_dashboard.html')
+
+
+
+@app.route('/success', methods = ['POST'])  
+def success():  
+    if request.method == 'POST':  
+        f = request.files['file']  
+        f.save(f.filename)  
+        return render_template("success.html", name = f.filename)  
+
+
+if __name__ == "__main__":
+    app.run()
+
+# @app.route("/index")
+# def index():
+#     if 'loggedin' in session: 
+#         return render_template("index.html")
+#     return redirect(url_for('login'))
+
+
 # @app.route("/solution")
 # def solution():
 #     return render_template ('solution.html')
@@ -257,58 +310,6 @@ def download(filename):
 #     return redirect(url_for('login')) 
 
 
-@app.route('/upload')
-def upload():
-   return render_template('upload.html')
-    
-       
-@app.route('/uploader',methods=['GET','POST'])
-def upload_file():
-    submission_id=str(random.randint(0,10000))
-    mesage=''
-    if request.method=='POST':
-        submission_date = datetime.now()
-        f = request.files['file']
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-
-        u1 =f"""select user_id from user where name ='{session['name']}';"""
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute(u1)
-        user_id_user=cursor.fetchall()
-        user_id=user_id_user[0]
-        print(user_id)
-
-        assignment_title=request.form['assignment_title']
-        
-        a1 =f"""select assignment_id from assignment where assignment_title={'assignment_title'};"""
-        cursor.execute(a1)
-
-        assignment_id_rec=cursor.fetchone()
-        print(user_id_user)
-        print(assignment_id_rec)
-        query=f"""insert into submission(submission_id,assignment_id,user_id,submission_date,solution )values('{submission_id}','{assignment_id_rec[0]}','{user_id[0]}','{submission_date}','{f.filename}');"""
-        print(query)
-        q=cursor.execute(query)
-        print(q)
-        mysql.connection.commit()
-        cursor.close()
-        mesage = 'You have successfully uploaded new assignment!'
-        return render_template('student_dashboard.html')
-
-
-# @app.route('/upload', methods = ['GET', 'POST'])
-# def upload():
-#    if request.method == 'POST':
-#       f = request.files['file']
-#       f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-#       return 'file uploaded successfully' 
-
-@app.route('/success', methods = ['POST'])  
-def success():  
-    if request.method == 'POST':  
-        f = request.files['file']  
-        f.save(f.filename)  
-        return render_template("success.html", name = f.filename)  
 
 # @app.route('/result',methods = ['POST', 'GET'])
 # def result():
@@ -318,15 +319,14 @@ def success():
 # def static(file_name):
 #    return send_from_directory('static', file_name)
 
-if __name__ == "__main__":
-    app.run()
 
 
-
-
-
-
-
+# @app.route('/upload', methods = ['GET', 'POST'])
+# def upload():
+#    if request.method == 'POST':
+#       f = request.files['file']
+#       f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+#       return 'file uploaded successfully' 
 
 
 # @app.route("/index",methods=['GET','POST'])
