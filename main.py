@@ -194,22 +194,6 @@ def view_assignment():
     return redirect(url_for('login'))  
 
 
-# @app.route('/view_solution',methods=['GET','POST'])
-# def view_solution():
-#     submission_id=str(random.randint(0,10000))
-#     mesage=''
-#     if request.method=='POST':
-#         assignment_id = request.form['assignment_id']
-#         user_id = request.form['user_id']
-#         submission_date = request.form['submission_date']
-#         solution= request.form['solution']
-#         cursor=mysql.connection.cursor()
-#         cursor.execute("select * from submission")
-#         mysql.connection.commit()
-#         mesage = 'You have successfully added new assignment!'
-#         return redirect(url_for('teacher_dashboard'))
-#     return render_template("view_solution.html",user=user)
-
 @app.route("/view_solution")
 def view_solution():
     if 'loggedin' in session:
@@ -218,6 +202,70 @@ def view_solution():
         user = cursor.fetchall()
         return render_template("view_solution.html", user=user)    
   
+#Below code(status_of_assignment) for teacher can see solution of assignment submiited by student and teacher can approve and reject assignment.
+
+@app.route('/status_of_assignment',methods=['POST'])
+def status_of_assignment():
+    if request.method == 'POST':
+        status_of_assignment = request.form['status_of_assignment']
+        submission_id = request.form['submission_id']
+        query = f"""update submission set status_of_assignment = '{status_of_assignment}' where submission_id ='{submission_id}';"""
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(query)
+        cursor = mysql.connection.cursor()
+        mysql.connection.commit()
+        return render_template('view_solution.html')
+
+
+#Below code (check_status)for students can view their assignments status-approved/reject.
+
+@app.route('/check_status') 
+def check_status():
+    if 'name' in session:
+        name=session['name']
+        u1 = f"""select user_id from user where name='{session['name']}' ;"""
+        cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(u1)
+        user_id_record=cursor.fetchall()
+        user_id=user_id_record[0]
+        # print(user_id)
+        # print(u1)
+        query2 = f"""select submission_id, assignment_id,user_id,status_of_assignment from submission where user_id ='{user_id['user_id']}';"""
+        cursor.execute(query2)
+        result = cursor.fetchall()
+        # print(result)
+        return render_template('check_status.html', records=result)
+
+
+
+#Below code (track_of_assignment)for teacher can track the assignments of students.
+
+@app.route("/track_of_assignment")
+def track_of_assignment():
+    if 'loggedin' in session:
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM submission')
+        result = cursor.fetchall()    
+        return render_template("track_of_assignment.html", records=result)
+   
+@app.route('/approved_list') 
+def approved_list():
+    cursor=mysql.connection.cursor()
+    query=f"""select name,email from user where user_id in (select user_id from submission where status_of_assignment="approved") ;"""
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return render_template("approved_list.html", records=result)
+   
+@app.route('/rejected_list') 
+def rejected_list():
+    cursor=mysql.connection.cursor()
+    query=f"""select name,email from user where user_id in (select user_id from submission where status_of_assignment="rejected") ;"""
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return render_template("rejected_list.html", records=result)
+   
+
+
 
 @app.route('/download/<string:filename>', methods=['GET'])
 def download(filename):
@@ -251,10 +299,8 @@ def upload_file():
         print(l1)
 
         assignment_title=request.form['assignment_title']
-        
         a1 =f"""select assignment_id from assignment where assignment_title={'assignment_title'};"""
         cursor.execute(a1)
-
         assignment_id_rec=cursor.fetchone()
         l2=assignment_id_rec.get('assignment_id')
         print(l2)
@@ -280,7 +326,7 @@ def success():
 if __name__ == "__main__":
     app.run()
 
-# @app.route("/index")
+# @app.route("/index")s
 # def index():
 #     if 'loggedin' in session: 
 #         return render_template("index.html")
@@ -291,6 +337,22 @@ if __name__ == "__main__":
 # def solution():
 #     return render_template ('solution.html')
 
+
+# @app.route('/view_solution',methods=['GET','POST'])
+# def view_solution():
+#     submission_id=str(random.randint(0,10000))
+#     mesage=''
+#     if request.method=='POST':
+#         assignment_id = request.form['assignment_id']
+#         user_id = request.form['user_id']
+#         submission_date = request.form['submission_date']
+#         solution= request.form['solution']
+#         cursor=mysql.connection.cursor()
+#         cursor.execute("select * from submission")
+#         mysql.connection.commit()
+#         mesage = 'You have successfully added new assignment!'
+#         return redirect(url_for('teacher_dashboard'))
+#     return render_template("view_solution.html",user=user)
 
 
 # @app.route("/view_assignment")

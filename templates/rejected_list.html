@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<html>
+<head>
+</head>
+<body>
+
+<h2>Students list whose assignments are rejected </h2>
+<table border="1">
+	<tr>
+		<th>Student  name</th>
+		<th>Email_id</th>
+	</tr>
+	{% for item in records %}
+	<tr>
+		<td>{{item['name']}}</td>
+		<td>{{item['email']}}</td>
+		
+	</tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+<html>
+<head>
+</head>
+<body>
+<h2> Check status</h2>
+<table border="1">
+	<tr>
+		<th>Submission Id</th>
+		<th>Assignment Id</th>
+		<th>User Id</th>
+		<th>Assignment status</th>
+	</tr>
+	{% for item in records %}
+		<tr>
+			<td>{{item['submission_id']}}</td>
+			<td>{{item['assignment_id']}}</td>
+			<td>{{item['user_id']}}</td>
+		    <td>{{item['status_of_assignment']}}</td>
+	    </tr>
+	{% endfor %}
+</table>
+<br>
+<br>
+<a href="/upload">Click here to resubmit the assignment</a>
+</body>
+</html>
+
+{% endblock %}

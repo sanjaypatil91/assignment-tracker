@@ -1,0 +1,26 @@
+Steps to create new repository (new code) in Git bash using Github:
+
+1.Sign-in or create github account into Github.com
+2.Click on “new repository”.
+3.Give name of repository.
+4.Click on “public”.
+5.Click on “Create repository” it will create home page of your repository.
+6.Got to git bash.(First install Gitbash: https://git-scm.com/download/win)
+7.Copy the file path those file to be upload in github desktop and give command in gitbash and press enter.
+Command=cd:/’’file_path_name”/
+8.To configure git use command: git config --global user.name "github user_id"
+9.Add command:git config --global user.email "your email_id"
+10.Give command “ls	” to see the list of files in existing files.
+9.To initialize  git, give command “git init”.
+10.Give command to see files:git commit -m "initial commit"
+11.Copy the SSH key and paste in gitbash using command:
+git remote add origin “copy the key” and enter.
+12.Give command : “git remote -v” to see git fetch and push origin.
+13.Give command :” git branch -M main” to go to main path and enter.
+14.Give command:”git push -u origin main” and enter.
+15.Then again give command “ls” to see existing files.
+16.Give command “git status”and see the update files.
+17.Give command “git add “file name”.
+18.Then again give command “git status” and see your main branch updated.
+19.Give command “git commit -m "your comments here" for your code editing or else update your code.
+20.And again give command “git push” to add the code in Github and refresh the your github page , you will get uploaded code.

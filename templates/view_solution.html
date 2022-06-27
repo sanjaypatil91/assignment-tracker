@@ -32,6 +32,20 @@
     {% endblock %}  
     
 
+{{ myhtml|e }}
+<h3>Add status of assignment!</h3>
+<form action="/status_of_assignment" method="post">
+    <label for="submission_id">Add submission id:</label>
+    <input type="text" name="submission_id" required>
+    <br>
+    <label for="status_of_assignment">Add status:</label>
+    <input type="text" name="status_of_assignment" required>
+    <br>
+    <br>
+    <button type="submit">Submit Status</button>
+</form>
 
+</body>
+</html>
 
 
