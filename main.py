@@ -21,7 +21,8 @@ app.config["MYSQL_CURSORCLASS"]="DictCursor"
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'password_123'
 app.config['MYSQL_DB'] = 'admin'
-app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER  
+app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER 
+
 
 
 @app.route('/Home', methods=['POST','GET'])
@@ -47,12 +48,71 @@ def login():
             session['type_of_user'] = user['type_of_user']
 
         if type_of_user=='Student':   
-            return render_template('student_dashboard.html', mesage = mesage) 
+            return redirect(url_for("student_dashboard"))
         elif type_of_user=='Teacher':
-            return render_template('teacher_dashboard.html',mesage=mesage)
+            return redirect(url_for("teacher_dashboard"))
         else:
             mesage = 'Please enter correct username / password !'
     return render_template('login.html', mesage = mesage) 
+
+
+
+
+@app.route('/forgot_password',methods=['GET','POST'])
+def forgot_password():
+    mesage=''
+    if request.method == 'POST' and 'password' in request.form:
+        password = request.form['password']
+        #cursor.execute('update user set password= (password) where name=session['name']')
+        query = f""" update user set password = '{password}' where name = '{session['name']}' """
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(query)
+        connection.commit()
+        mesage='Password is changed successfully..!!'
+    return render_template('forgot_password.html',mesage1=mesage)
+    
+
+# @app.route('/login', methods=["GET", "POST"])
+# def login():
+#     mesage=''
+#     if request.method == "GET":
+
+#         name = request.form['name']
+#         password = request.form['password']
+#         #all_users = getuser_from_user_id(user_id)
+#         #user_type = get_type_of_user(user_id)
+
+#         #if len(all_users) == 0:
+#         #return render_template("login.html")
+
+#         #elif len(all_users) > 1:
+#             #raise Exception(f"Multiple users with same user_id present")
+#         # user = all_users[0]
+#         # type = user_type[0]
+#         # print(user[1])
+#     if session['name'] == request.form['name']:
+#         return redirect(url_for("student_dashboard"))
+#     elif session['name'] == request.form['name']:
+#         return redirect(url_for("teacher_dashboard"))
+#     elif session['password'] == request.form['[password]']:
+#         mesage="Password is incorrect"
+#         return render_template("login.html",mesagege=mesage)
+
+# def getuser_from_user_id(user_id):
+#     query = f"""select * from user where name = '{user_id}';"""
+#     print(query)
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute(query)
+#     result = cursor.fetchall()
+#     return None
+#     return result
+
+# def get_type_of_user(user_id):
+#     query = f"""select type_of_user from user where name='{user_id}' ;"""
+#     print(query)
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute(query)
+#     result = cursor.fetchall()
 
 
 @app.route('/logout')
@@ -61,21 +121,28 @@ def logout():
     session.pop('user_id', None)
     session.pop('email', None)
     return redirect(url_for('login'))
-  
+
+
+@app.route('/')  
 @app.route('/register/',methods=['POST','GET'])
 def register():
+    user_id=str(random.randint(0,10000))
     mesage=''
-    if request.method=='POST':
+    if request.method == 'POST' and 'name' in request.form and 'email' in request.form and 'password' in request.form and 'type_of_user' in request.form:
+        # user_id=request.form['user_id']
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
+        type_of_user = request.form['type_of_user']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor=mysql.connection.cursor()
-        cursor.execute("insert into user(name,email,password) values(%s,%s,%s)",(name,email,password))
+        cursor.execute("insert into user(user_id,name,email,password,type_of_user) values(%s,%s,%s,%s,%s)",(user_id,name,email,password,type_of_user))
         mysql.connection.commit()
         cursor.close()
         mesage='Registration Successfully. Login Here...','success'
         return redirect(url_for('login'))
     return render_template("register.html",mesage=mesage)
+
 
 
 @app.route("/display")
@@ -97,7 +164,7 @@ def update():
             email = request.form['email']
             password = request.form['password']
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute('SELECT * FROM user WHERE name = %s', (name, ))
+            cursor.execute('SELECT * FROM user WHERE name = %s', (name))
             user = cursor.fetchone()
             if user:
                 mesage = 'Account already exists !'
@@ -115,36 +182,16 @@ def update():
     return redirect(url_for('login'))   
 
 
-@app.route('/delete')
+@app.route("/delete/")
 def delete():
-    msg="Your account is deleted successfully"
-    if 'name' in session:
-        name = session['name']
-    print(name)
-    query=f"""delete from user where name='{name}';"""
-    try:
-        with mysql.connector.connect(host="localhost",user="root",password="password_123",database="admin") as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-    except Exception as e:
-        print(e)    
-    
-    page = render_template("Home.html",msg=msg)
-    return page
-
-
-
-# @app.route("/delete",methods=['GET','POST'])
-# def delete():
-#     if request.method=='POST':
-#         connection=mysql.connection.cursor()
-#         sql="delete from user where user_id=%s"
-#         connection.execute(sql,user_id)
-#         mysql.connection.commit()
-#         connection.close()
-#         mesage=('User details deleted')
-#         return redirect(url_for("Home"))
+    if request.method=='POST':
+        connection=mysql.connection.cursor()
+        cursor.execute("delete from user")
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        mysql.connection.commit()
+        connection.close()
+        mesage=('User details deleted')
+    return redirect(url_for("Home"))
 
 
 @app.route("/student_dashboard",methods=["GET","POST"])
@@ -256,6 +303,7 @@ def approved_list():
     result = cursor.fetchall()
     return render_template("approved_list.html", records=result)
    
+
 @app.route('/rejected_list') 
 def rejected_list():
     cursor=mysql.connection.cursor()
@@ -265,14 +313,11 @@ def rejected_list():
     return render_template("rejected_list.html", records=result)
    
 
-
-
 @app.route('/download/<string:filename>', methods=['GET'])
 def download(filename):
    print(filename)
    uploads=UPLOAD_FOLDER
    return send_file(uploads+'/'+filename, as_attachment=True)
-
 
 
 @app.route('/upload')
@@ -323,8 +368,49 @@ def success():
         return render_template("success.html", name = f.filename)  
 
 
+    # @app.route('/static/<path:file_name>',)
+    # def static(file_name):
+    #    return send_from_directory('static', file_name)
+
 if __name__ == "__main__":
     app.run()
+
+
+
+# @app.route('/register/', methods =['GET', 'POST'])
+# def register():
+#     user_id=str(random.randint(0,10000))
+#     mesage=''
+#     if request.method == 'POST' and 'name' in request.form and 'email' in request.form and 'password' in request.form and 'type_of_user' in request.form:
+#         name = request.form['name']
+#         email_ = request.form['email']
+#         password = request.form['password']
+#         type_of_user = request.form['type_of_user']
+#         cursor=mysql.connection.cursor()
+#         cursor.execute("insert into user(user_id,name,email,password, type_of_user) values(%s,%s,%s,%s,%s),(user_id,name,email,password, type_of_user)")
+#         #cursor.execut("insert into user(user_id,name,email,password, type_of_user)values('{user_id}','{name}','{email}','{password}','{type_of_user}');")
+#         connection.commit()
+#         cursor.close()
+#         mesage = 'You have successfully registered !'
+#         return redirect(url_for('login'))
+#     return render_template('register.html', mesage = mesage)
+
+
+
+# @app.route('/delete')
+# def delete():
+#     mesage=''
+#     if request.method=='POST':
+#         if 'name' in session:
+#             name = session['name']
+#             print(name)
+#             cursor.execute('delet FROM user WHERE name = %s', (name))
+#             #query=f"""delete from user where name='{name}';"""
+#             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#             mysql.connection.commit()
+#             mesage="Your account is deleted successfully"   
+#         return render_template("Home.html",mesage=mesage)
+    
 
 # @app.route("/index")s
 # def index():
@@ -377,9 +463,6 @@ if __name__ == "__main__":
 # def result():
 #       return render_template("result.html")
 
-# @app.route('/static/<path:file_name>',)
-# def static(file_name):
-#    return send_from_directory('static', file_name)
 
 
 
