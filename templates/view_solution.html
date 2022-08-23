@@ -1,13 +1,13 @@
 
 
-
-{% block body %} 
+{% extends "layout.html" %}
+{% block body %}
 <title>View Assignment</title>
 <html>
 <head></head>
 <body>
 
-<h2>Check Solution of Assignments!!!!!!
+<h><b>Check Solution of Assignments!</b></h>
 <br>
 <br>
 <table border="1">
@@ -29,11 +29,11 @@
     </tr>
     {% endfor %}
     </table>
-    {% endblock %}  
+    
     
 
 {{ myhtml|e }}
-<h3>Add status of assignment!</h3>
+<h>Add status of assignment!</h>
 <form action="/status_of_assignment" method="post">
     <label for="submission_id">Add submission id:</label>
     <input type="text" name="submission_id" required>
@@ -48,4 +48,7 @@
 </body>
 </html>
 
+
+
+{% endblock %}
 

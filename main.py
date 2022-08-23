@@ -24,7 +24,6 @@ app.config['MYSQL_DB'] = 'admin'
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER 
 
 
-
 @app.route('/Home', methods=['POST','GET'])
 def Home():
     return render_template('Home.html')
@@ -44,7 +43,7 @@ def login():
             session['loggedin'] = True
             session['user_id'] = user['user_id']
             session['name'] = user['name']
-            session['password'] = user['password'],
+            session['password'] = user['password']
             session['type_of_user'] = user['type_of_user']
 
         if type_of_user=='Student':   
@@ -54,8 +53,6 @@ def login():
         else:
             mesage = 'Please enter correct username / password !'
     return render_template('login.html', mesage = mesage) 
-
-
 
 
 @app.route('/forgot_password',methods=['GET','POST'])
@@ -71,49 +68,6 @@ def forgot_password():
         mesage='Password is changed successfully..!!'
     return render_template('forgot_password.html',mesage1=mesage)
     
-
-# @app.route('/login', methods=["GET", "POST"])
-# def login():
-#     mesage=''
-#     if request.method == "GET":
-
-#         name = request.form['name']
-#         password = request.form['password']
-#         #all_users = getuser_from_user_id(user_id)
-#         #user_type = get_type_of_user(user_id)
-
-#         #if len(all_users) == 0:
-#         #return render_template("login.html")
-
-#         #elif len(all_users) > 1:
-#             #raise Exception(f"Multiple users with same user_id present")
-#         # user = all_users[0]
-#         # type = user_type[0]
-#         # print(user[1])
-#     if session['name'] == request.form['name']:
-#         return redirect(url_for("student_dashboard"))
-#     elif session['name'] == request.form['name']:
-#         return redirect(url_for("teacher_dashboard"))
-#     elif session['password'] == request.form['[password]']:
-#         mesage="Password is incorrect"
-#         return render_template("login.html",mesagege=mesage)
-
-# def getuser_from_user_id(user_id):
-#     query = f"""select * from user where name = '{user_id}';"""
-#     print(query)
-#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cursor.execute(query)
-#     result = cursor.fetchall()
-#     return None
-#     return result
-
-# def get_type_of_user(user_id):
-#     query = f"""select type_of_user from user where name='{user_id}' ;"""
-#     print(query)
-#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cursor.execute(query)
-#     result = cursor.fetchall()
-
 
 @app.route('/logout')
 def logout():
@@ -263,7 +217,6 @@ def status_of_assignment():
         mysql.connection.commit()
         return render_template('view_solution.html')
 
-
 #Below code (check_status)for students can view their assignments status-approved/reject.
 
 @app.route('/check_status') 
@@ -282,8 +235,6 @@ def check_status():
         result = cursor.fetchall()
         # print(result)
         return render_template('check_status.html', records=result)
-
-
 
 #Below code (track_of_assignment)for teacher can track the assignments of students.
 
@@ -359,7 +310,6 @@ def upload_file():
         return render_template('student_dashboard.html')
 
 
-
 @app.route('/success', methods = ['POST'])  
 def success():  
     if request.method == 'POST':  
@@ -368,12 +318,56 @@ def success():
         return render_template("success.html", name = f.filename)  
 
 
-    # @app.route('/static/<path:file_name>',)
-    # def static(file_name):
-    #    return send_from_directory('static', file_name)
+    # @app.route('/static/<path:filename>',)
+    # def static(filename):
+    #    return send_from_directory('static', filename)
 
 if __name__ == "__main__":
     app.run()
+
+
+
+# @app.route('/login',methods=["GET","POST"])
+# def login():
+#     if request.method == "GET":
+#         return render_template("login.html")
+#         return page
+#     elif request.method == "POST":
+#         mesage="Invalid Login"
+#         name = request.form['name']
+#         password = request.form['password']
+#         USERS = get_USER(name)
+#         User_type=get_type_of_user(name)
+
+#         if len(USERS)==0:
+#             return render_template("login.html")
+#         if len(USERS)>1:
+#             raise Exception (f"Multiple USERS with same name present")
+
+#         USER = USERS[0]
+#         User_type=User_type[0]
+        
+#         if USER[2]==password and User_type[0]=="Student":
+#             session['name']=request.form['name']
+#             return redirect(url_for("student_dashboard"))
+
+#         elif USER[2]==password and User_type[0]=="Faculty":
+#             return redirect(url_for("teacher_dashboard"))
+#         else:
+#             return render_template('login.html',mesage=mesage)
+    
+        
+# def get_USER(name):
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute(f"""select * from user where name = '{name}';""")
+#     result=cursor.fetchall()
+#     return result
+    
+# def get_type_of_user(name):
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute(f"""select type_of_user from user where name = '{name}';""")
+#     result=cursor.fetchall()
+#     return result
 
 
 
@@ -464,6 +458,28 @@ if __name__ == "__main__":
 #       return render_template("result.html")
 
 
+# @app.route("/uploader",methods=["GET","POST"])
+# def upload_file():
+#     submission_id=str(random.randint(0,1000000))
+#     mesage=''
+#     if request.method=='POST':
+
+#         submission_date=datetime.now()
+#         f = request.files['file']
+#         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+#         u1 =f"""select user_id from user where name ='{session['name']}';"""
+#         cursor = mysql.connection.cursor()
+#         cursor.execute(u1)
+
+#         assignment_id=cursor.fetchone()
+#         assignment_title=request.form('assignment_title')
+#         cursor.execute(f"""insert into submission(submission_id,assignment_id,user_id,submission_date,solution)
+#                     values('{submission_id}','{assignment_id}','{user_id}','{submission_date}','{f.filename}');""")
+#         mysql.connection.commit()
+#         cursor.close()
+#         mesage = 'You have successfully uploaded new assignment !'
+#         return render_template("student_dashboard.html",mesage=mesage)
+
 
 
 # @app.route('/upload', methods = ['GET', 'POST'])
@@ -507,16 +523,6 @@ if __name__ == "__main__":
 #         user = cursor.fetchone()
 #         return render_template('profile.html', user=user)
 #     return redirect(url_for('login'))    
-
-
-# @app.route("/")
-# def home():
-#     connection=mysql.connection.cursor()
-#     sql="SELECT * FROM user"
-#     connection.execute(sql)
-#     res=connection.fetchall()
-#     return render_template("home.html",datas=res)
-
 
 
 # @app.route("/profile",methods=['GET','POST'])
